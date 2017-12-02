@@ -56129,10 +56129,11 @@ window.onmousedown= function(event){
 var mouseX=event.clientX;
 var mouseY=event.clientY;
 console.log(mouseX,mouseY);
+
 rockArray[rockCount]={
 		pos: {
-			x:mouseX,//(Math.random()*400)-200,
-			y:mouseY,//(Math.random()*400)-200,
+			x:(Math.random()*400)-200,
+			y:(Math.random()*400)-200,
 			z:0
 		},
 		head: {
@@ -56149,8 +56150,8 @@ rockCount++
 for(var num=0;num<rockCount;num++){
 	rockArray[num]={
 		pos: {
-			x:(Math.random()*3200)-1600,
-			y:(Math.random()*2200)-1100,
+			x:(Math.random()*400)-200,
+			y:(Math.random()*400)-200,
 			z:0
 		},
 		head: {
@@ -56166,8 +56167,8 @@ for(var num=0;num<rockCount;num++){
 for(var pi=0;pi<planetCount;pi++){
 	planetArray[pi]={
 		pos:{
-			x:(Math.random()*12000)-6000,
-			y:(Math.random()*5000)-2500,
+			x:(Math.random()*400)-200,
+			y:(Math.random()*400)-200,
 			z:0
 		},
 		mass:1+((Math.random()*10)*(Math.random()*4))
@@ -56180,7 +56181,7 @@ function reglStuff(){
 	var sphereRadius=1;
 	var sphereMesh=sphereBuilder(sphereRadius,{segments: 16});
 	
-	var drawT=regl({
+	var drawT=regl({ //DRAW PLANETS AND ROCKS
 		frag: document.getElementById('FShade').text,
 		vert: document.getElementById('VShade').text ,
 
@@ -56194,7 +56195,7 @@ function reglStuff(){
 			color: regl.prop('color'),
 			zoom: regl.prop('zoom'),
 			scale: regl.prop('scale'),
-			translation: regl.prop('translation'),  
+			translation: regl.prop('translation'),  //rock translation old?
 			pulse: regl.prop('pulse'),
 			model: mat4.fromRotationTranslationScale([], quat.rotateX([],quat.create(),Math.PI/0.5), [0,0,0], [1,1,1]),
 			res: function(o){
@@ -56209,28 +56210,6 @@ function reglStuff(){
 		mag: 'linear'
 	});
 
-	const drawFeedback = regl({
-		frag: document.getElementById('FFeed').text,
-		vert: document.getElementById('VFeed').text,
-		attributes:{
-			position: [-2, 0, 0, -2, 2, 2]
-		},
-		uniforms:{
-			texture: feedBackTexture,
-			t: ({tick}) => 0.001 * tick
-		},
-		depth:{
-			enable: false
-		},
-		count: 3,
-		blend:{
-			enable: true,
-			func:{
-				src: 'src alpha',
-				dst: 'dst color'
-			}
-		},
-	});
 
 	const drawHistory = regl({
 		frag: document.getElementById('histF').text,
@@ -56304,13 +56283,12 @@ function reglStuff(){
 			color:[0,0,0,1]
 		})
 	
-
 			//drawFeedback();		
 	
 		for(var p=0;p<planetCount;p++){
-			drawT({
+			drawT({ // 111111111
 				color: [1.1-(1/planetArray[p].mass),1.1-(1/planetArray[p].mass),(1/planetArray[p].mass),1],
-			 	scale: rockScale*planetArray[p].mass*5,
+			 	scale: rockScale*planetArray[p].mass*5, //planet SCALE (irrelevent)
 				translation: [planetArray[p].pos.x,planetArray[p].pos.y,planetArray[p].pos.z],//sx,sy,0],
 				pulse: (o.tick%1000)/1000,
 				prim: primType,
@@ -56367,16 +56345,17 @@ function reglStuff(){
 			drawHistory({
 				positions:rockArray[r].history,
 				color: [0.1+(r/rockCount),0.1+((r/rockCount)*0.5),1.1-(r/rockCount),1],
-			 	scale: rockScale,
-				zoom: viewScale,
+			 	scale: rockScale, //rock SCALE
+				zoom: viewScale, //rock ZOOM
 				count: rockArray[r].history.length
 			});
 			
-			drawT({
+			drawT({ //change DEFINITION above, add POSITIONS, remove TRANSLATION
 				color: [0.1+(r/rockCount),0.1+((r/rockCount)*0.5),1.1-(r/rockCount),1],
-			 	scale: rockScale,
+			 	scale: rockScale, //rock SCALE
 
-				translation: [rockArray[r].pos.x,rockArray[r].pos.y,rockArray[r].pos.z],
+				translation: [rockArray[r].pos.x,rockArray[r].pos.y,rockArray[r].pos.z], //rock TRANSLATION WITH TEXTURE FEEDBACK THIS IS THE SMALLER ONE
+				//Do WITHOUT translation
 				pulse: (o.tick%1000)/1000,
 				prim: primType,
 				zoom: viewScale
